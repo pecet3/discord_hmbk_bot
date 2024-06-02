@@ -9,10 +9,11 @@ import (
 func main() {
 	c := colly.NewCollector()
 
-	// Find and visit all links
 	c.OnHTML("div.news", func(e *colly.HTMLElement) {
-		// fmt.Println(e.ChildText("div"))
+		fmt.Println()
 		fmt.Println(e.ChildText("a"))
+		fmt.Println(e.ChildText("p.text"))
+		fmt.Println()
 	})
 
 	c.OnRequest(func(r *colly.Request) {
@@ -20,4 +21,5 @@ func main() {
 	})
 
 	c.Visit("https://tygodnikszczytno.pl/news/")
+
 }
