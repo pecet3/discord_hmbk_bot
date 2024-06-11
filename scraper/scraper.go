@@ -9,6 +9,9 @@ import (
 type Article struct {
 	Title   string
 	Content string
+	Date    string
+	Link    string
+	Image   string
 }
 
 type CityNews struct {

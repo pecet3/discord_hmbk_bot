@@ -18,6 +18,7 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
+	log.Println("Interupted")
 }
 
 func loadEnv() {
@@ -25,5 +26,5 @@ func loadEnv() {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
-	log.Println("Loaded .env")
+	log.Println("[👍] Loaded .env")
 }

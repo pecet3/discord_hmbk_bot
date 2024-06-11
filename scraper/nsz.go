@@ -1,7 +1,7 @@
 package scraper
 
 import (
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -18,26 +18,85 @@ func (ns NszScraper) GetArticles(cn *CityNews) []Article {
 	}
 	c := colly.NewCollector()
 
-	var a Article
+	baseUrl := "https://tygodnikszczytno.pl"
+	route := baseUrl + "/news"
 
-	c.OnHTML("div.news", func(e *colly.HTMLElement) {
-		a.Title = e.ChildText("a")
-		a.Content = e.ChildText("p.text")
+	articleChan := make(chan Article, 10) // Buffered channel for articles
+	linkChan := make(chan string, 10)     // Buffered channel for links
+	imageChan := make(chan string, 10)
+	go func() {
+		defer close(articleChan)
+		defer close(linkChan)
 
-		findingStr := "CZYTAJ"
+		c.OnHTML("div.news", func(e *colly.HTMLElement) {
+			var a Article
+			src := e.Attr("src")
+			log.Println(src)
+			a.Title = e.ChildText("a")
+			a.Content = e.ChildText("p.text")
+			a.Date = e.ChildText("p.date")
+			a.Image = e.ChildAttr("img", "src")
+			log.Println(a.Image)
+			findingStr := "CZYTAJ"
+			if strings.Contains(a.Title, findingStr) {
+				index := strings.Index(a.Title, findingStr)
+				a.Title = a.Title[:index]
+			}
+			articleChan <- a
+			imageChan <- a.Image
+		})
 
-		if strings.Contains(a.Title, findingStr) {
-			index := strings.Index(a.Title, findingStr)
-			a.Title = a.Title[:index]
-		}
-		cn.Articles = append(cn.Articles, a)
-	})
+		c.OnHTML("a.readmore", func(e *colly.HTMLElement) {
+			path := e.Attr("href")
+			link := baseUrl + path
+			linkChan <- link
+		})
 
+		c.Visit(route)
+	}()
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("News fetching from: ", r.URL)
+		log.Println("News fetching from: ", r.URL)
 	})
+	var articles []Article
+	var links []string
+	var images []string
+	for {
+		select {
+		case article, ok := <-articleChan:
+			if ok {
+				articles = append(articles, article)
+			} else {
+				articleChan = nil
+			}
+		case link, ok := <-linkChan:
+			if ok {
+				links = append(links, link)
+			} else {
+				linkChan = nil
+			}
+		case image, ok := <-imageChan:
+			if ok {
+				images = append(images, image)
+			} else {
+				imageChan = nil
+			}
+		}
 
-	c.Visit("https://tygodnikszczytno.pl/news/")
+		if articleChan == nil && linkChan == nil {
+			break
+		}
+	}
+
+	for i, art := range articles {
+		if i < len(links) {
+			art.Link = links[i]
+		}
+
+		art.Image = images[i]
+
+		cn.Articles = append(cn.Articles, art)
+	}
+	log.Println(cn.Articles)
 
 	cn.ExpiresAt = time.Now().Add(6 * time.Hour)
 	return cn.Articles
