@@ -1,4 +1,4 @@
-package news
+package scraper
 
 import (
 	"fmt"
@@ -8,20 +8,13 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type Article struct {
-	Title   string
-	Content string
+type NszScraper struct {
 }
 
-type CityNews struct {
-	Name      string
-	Articles  []Article
-	ExpiresAt time.Time
-}
+func (ns NszScraper) GetArticles(cn *CityNews) []Article {
 
-func (n *CityNews) GetArticles() []Article {
-	if !n.ExpiresAt.Before(time.Now()) {
-		return n.Articles
+	if !cn.ExpiresAt.Before(time.Now()) {
+		return cn.Articles
 	}
 	c := colly.NewCollector()
 
@@ -37,15 +30,15 @@ func (n *CityNews) GetArticles() []Article {
 			index := strings.Index(a.Title, findingStr)
 			a.Title = a.Title[:index]
 		}
-		n.Articles = append(n.Articles, a)
+		cn.Articles = append(cn.Articles, a)
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL)
+		fmt.Println("News fetching from: ", r.URL)
 	})
 
 	c.Visit("https://tygodnikszczytno.pl/news/")
 
-	n.ExpiresAt = time.Now().Add(6 * time.Hour)
-	return n.Articles
+	cn.ExpiresAt = time.Now().Add(6 * time.Hour)
+	return cn.Articles
 }
