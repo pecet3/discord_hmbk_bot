@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Article struct {
+type Entity struct {
 	Title   string
 	Content string
 	Date    string
@@ -14,29 +14,29 @@ type Article struct {
 	Image   string
 }
 
-type CityNews struct {
+type Page struct {
 	Name      string
-	Articles  []Article
+	Entities  []Entity
 	ExpiresAt time.Time
 	Scraper   IScraper
 }
 
 type Scraper struct {
-	CitiesMap map[string]*CityNews
-	mu        sync.RWMutex
+	PagesMap map[string]*Page
+	mu       sync.RWMutex
 }
 
 func New() *Scraper {
 	return &Scraper{
-		CitiesMap: make(map[string]*CityNews),
+		PagesMap: make(map[string]*Page),
 	}
 }
 
-func (s *Scraper) GetCity(cName string) (*CityNews, error) {
+func (s *Scraper) GetPage(name string) (*Page, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	cn, exists := s.CitiesMap[cName]
+	cn, exists := s.PagesMap[name]
 
 	if !exists {
 		return nil, errors.New("there is no such city")
@@ -44,13 +44,13 @@ func (s *Scraper) GetCity(cName string) (*CityNews, error) {
 	return cn, nil
 }
 
-func (s *Scraper) SaveCity(cn *CityNews) {
+func (s *Scraper) SavePage(p *Page) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.CitiesMap[cn.Name] = cn
+	s.PagesMap[p.Name] = p
 }
 
 type IScraper interface {
-	GetArticles(cn *CityNews) []Article
+	GetEntities(p *Page) []Entity
 }

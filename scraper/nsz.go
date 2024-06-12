@@ -11,25 +11,24 @@ import (
 type NszScraper struct {
 }
 
-func (ns NszScraper) GetArticles(cn *CityNews) []Article {
+func (ns NszScraper) GetEntities(cn *Page) []Entity {
 
 	if !cn.ExpiresAt.Before(time.Now()) {
-		return cn.Articles
+		return cn.Entities
 	}
 	c := colly.NewCollector()
 
 	baseUrl := "https://tygodnikszczytno.pl"
 	route := baseUrl + "/news"
 
-	articleChan := make(chan Article, 10) // Buffered channel for articles
-	linkChan := make(chan string, 10)     // Buffered channel for links
-	imageChan := make(chan string, 10)
+	EntityChan := make(chan Entity, 10)
+	linkChan := make(chan string, 10)
 	go func() {
-		defer close(articleChan)
+		defer close(EntityChan)
 		defer close(linkChan)
 
 		c.OnHTML("div.news", func(e *colly.HTMLElement) {
-			var a Article
+			var a Entity
 			src := e.Attr("src")
 			log.Println(src)
 			a.Title = e.ChildText("a")
@@ -42,8 +41,8 @@ func (ns NszScraper) GetArticles(cn *CityNews) []Article {
 				index := strings.Index(a.Title, findingStr)
 				a.Title = a.Title[:index]
 			}
-			articleChan <- a
-			imageChan <- a.Image
+			EntityChan <- a
+
 		})
 
 		c.OnHTML("a.readmore", func(e *colly.HTMLElement) {
@@ -57,16 +56,16 @@ func (ns NszScraper) GetArticles(cn *CityNews) []Article {
 	c.OnRequest(func(r *colly.Request) {
 		log.Println("News fetching from: ", r.URL)
 	})
-	var articles []Article
+	var Entities []Entity
 	var links []string
-	var images []string
+
 	for {
 		select {
-		case article, ok := <-articleChan:
+		case Entity, ok := <-EntityChan:
 			if ok {
-				articles = append(articles, article)
+				Entities = append(Entities, Entity)
 			} else {
-				articleChan = nil
+				EntityChan = nil
 			}
 		case link, ok := <-linkChan:
 			if ok {
@@ -74,30 +73,22 @@ func (ns NszScraper) GetArticles(cn *CityNews) []Article {
 			} else {
 				linkChan = nil
 			}
-		case image, ok := <-imageChan:
-			if ok {
-				images = append(images, image)
-			} else {
-				imageChan = nil
-			}
+
 		}
 
-		if articleChan == nil && linkChan == nil {
+		if EntityChan == nil && linkChan == nil {
 			break
 		}
 	}
 
-	for i, art := range articles {
+	for i, art := range Entities {
 		if i < len(links) {
 			art.Link = links[i]
 		}
 
-		art.Image = images[i]
-
-		cn.Articles = append(cn.Articles, art)
+		cn.Entities = append(cn.Entities, art)
 	}
-	log.Println(cn.Articles)
 
 	cn.ExpiresAt = time.Now().Add(6 * time.Hour)
-	return cn.Articles
+	return cn.Entities
 }
