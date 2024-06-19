@@ -17,7 +17,7 @@ const (
 )
 
 func Run(discord *discordgo.Session) {
-
+	defer discord.Close()
 	scrap := scraper.New()
 
 	scrap.PagesMap["szczytno"] = &scraper.Page{
@@ -45,8 +45,11 @@ func Run(discord *discordgo.Session) {
 		}
 
 		if strings.Contains(m.Content, DAY) {
-			log.Println(1)
 			handleDay(s, m, scrap)
+		}
+
+		if strings.Contains(m.Content, IQ) {
+			handleIq(s, m)
 		}
 
 	})

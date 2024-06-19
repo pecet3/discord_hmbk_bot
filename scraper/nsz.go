@@ -3,7 +3,6 @@ package scraper
 import (
 	"log"
 	"strings"
-	"time"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -13,9 +12,6 @@ type NszScraper struct {
 
 func (ns NszScraper) GetEntities(cn *Page) []Entity {
 
-	if !cn.ExpiresAt.Before(time.Now()) {
-		return cn.Entities
-	}
 	c := colly.NewCollector()
 
 	baseUrl := "https://tygodnikszczytno.pl"
@@ -29,13 +25,10 @@ func (ns NszScraper) GetEntities(cn *Page) []Entity {
 
 		c.OnHTML("div.news", func(e *colly.HTMLElement) {
 			var a Entity
-			src := e.Attr("src")
-			log.Println(src)
 			a.Title = e.ChildText("a")
 			a.Content = e.ChildText("p.text")
 			a.Date = e.ChildText("p.date")
 			a.Image = e.ChildAttr("img", "src")
-			log.Println(a.Image)
 			findingStr := "CZYTAJ"
 			if strings.Contains(a.Title, findingStr) {
 				index := strings.Index(a.Title, findingStr)
@@ -88,7 +81,5 @@ func (ns NszScraper) GetEntities(cn *Page) []Entity {
 
 		cn.Entities = append(cn.Entities, art)
 	}
-
-	cn.ExpiresAt = time.Now().Add(6 * time.Hour)
 	return cn.Entities
 }

@@ -11,6 +11,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	log.Println("[👍] Loaded .env")
+}
+
 func main() {
 	loadEnv()
 	discordToken := os.Getenv("DISCORD_TOKEN")
@@ -26,12 +34,4 @@ func main() {
 	<-sc
 	dc.Close()
 	log.Println("Interupted")
-}
-
-func loadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-	log.Println("[👍] Loaded .env")
 }

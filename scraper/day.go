@@ -28,7 +28,7 @@ func (ns DayScraper) GetEntities(cn *Page) []Entity {
 	route := baseUrl
 
 	var entities []Entity
-	ch := make(chan bool)
+	ch := make(chan int)
 	go func() {
 		c.OnHTML("div.descritoptions-of-holiday", func(e *colly.HTMLElement) {
 			titlesStr := e.ChildText("a")
@@ -40,18 +40,18 @@ func (ns DayScraper) GetEntities(cn *Page) []Entity {
 				ent.Title = title
 				ent.Content = contents[i]
 				entities = append(entities, ent)
+				if i == len(titles)-1 {
+					ch <- len(titles)
+				}
 			}
-			ch <- true
-
 		})
 		c.OnRequest(func(r *colly.Request) {
 			log.Println("Days fetching from: ", r.URL)
 		})
 
 		c.Visit(route)
-
 	}()
-	<-ch
-
-	return entities
+	i := <-ch
+	cn.Entities = entities[:i]
+	return cn.Entities
 }
