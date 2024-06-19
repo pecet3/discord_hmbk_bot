@@ -13,9 +13,7 @@ type DayScraper struct {
 
 func splitByUpperCase(s string) []string {
 	re := regexp.MustCompile(`([a-ząćęłńóśźż])([A-ZĄĆĘŁŃÓŚŹŻ])`)
-	// Zamieniamy miejsca występowania przejść na mała -> wielka litera na mała litera + spacja + wielka litera
 	withSpaces := re.ReplaceAllString(s, "$1,$2")
-	// Dzielimy ciąg na części według spacji
 	parts := strings.Split(withSpaces, ",")
 	return parts
 }
