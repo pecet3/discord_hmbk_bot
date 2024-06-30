@@ -28,17 +28,21 @@ func weightedRandom() int {
 func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
 	result := weightedRandom()
 	resultStr := strconv.Itoa(result)
-	log.Println(m.Content)
 	summary := ""
-	log.Println(m.Mentions[0].Mention())
+
 	if result > 120 {
 		summary = "To bardzo mądry człowiek."
 	} else {
 		summary = "Inteligencją nie grzeszy..."
 	}
+	var display string
+	if len(m.Mentions) <= 0 {
+		display = m.Author.Mention() + " ma " + resultStr + " IQ.\n" + summary
 
-	display := m.Author.Mention() + " ma " + resultStr + " IQ.\n" + summary + m.Mentions[0].Mention()
-
+	} else {
+		display = m.Mentions[0].Mention() + " ma " + resultStr + " IQ.\n" + summary
+	}
+	log.Println(">", display)
 	s.ChannelMessageSend(m.ChannelID, display)
 
 }
