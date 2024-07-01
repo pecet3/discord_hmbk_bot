@@ -8,8 +8,7 @@ import (
 	"time"
 )
 
-func Run(ps *PaintSessions) {
-	mux := http.NewServeMux()
+func Run(mux *http.ServeMux, ps *PaintSessions) {
 
 	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
 

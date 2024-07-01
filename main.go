@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,11 +29,14 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	mux := http.NewServeMux()
 
 	ps := paint.NewPaintSessions()
 
 	discord.Run(dc, ps)
-	paint.Run(ps)
+	paint.Run(mux, ps)
+
+	http.ListenAndServe(":8080", mux)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
