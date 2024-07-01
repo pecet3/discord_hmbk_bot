@@ -3,18 +3,161 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Prosty Formularz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMBK paint</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: rgb(77, 175, 255);
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #canvas {
+            border: 2px solid black;
+            background-color: white;
+            border-radius: 0.5rem;
+        }
+
+        #controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            border-radius: 0.5rem;
+            background-color: rgb(21, 255, 60);
+            padding: 0.8rem;
+            cursor: pointer;
+            font-family: monospace;
+
+        }
+
+        #sendBtn {
+            background-color: rgb(216, 21, 255);
+            text-align: center;
+            margin: auto;
+        }
+
+        #container {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+
 </head>
 
 <body>
-    <h1>Prosty Formularz</h1>
-    <form action="/painting" method="post">
-        <input type="text" id="" name="session" required><br><br>
+    <h1>HMBK paint</h1>
+    <div>
+        <canvas id="canvas" width="800" height="600" class="">
+        </canvas>
+        <div id="container">
+            <div id="controls">
+                <button id="clearBtn">Wyczyść</button>
+                <button id="eraserBtn">Gumka</button>
+                <input type="color" id="colorPicker" value="#000000">
+                <input type="range" id="sizeSlider" min="1" max="50" value="5">
+                <span id="sizeValue">5</span>
+                <input type="color" id="backgroundColorPicker" value="#FFFFFF">
+                <button id="changeBackgroundBtn">*Zmień tło</button>
+                <p><b>*UWAGA - resetuje cały obraz</b></p>
+            </div>
+            <button id="sendBtn">Wyślij</button>
+        </div>
 
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
+        let backgroundColor = '#FFFFFF';
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        <input type="submit" value="Wyślij">
-    </form>
+        let painting = false;
+        let eraser = false;
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!painting) return;
+            ctx.lineWidth = document.getElementById('sizeSlider').value;
+            ctx.lineCap = 'round';
+
+            if (eraser) {
+                ctx.strokeStyle = backgroundColor;
+            } else {
+                ctx.strokeStyle = document.getElementById('colorPicker').value;
+            }
+
+            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const url = new URL(window.location.href)
+            const sessionId = url.searchParams.get('session_id');
+
+            const dataURL = canvas.toDataURL('image/png');
+            fetch('/painting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: dataURL, session_id: sessionId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    document.body.innerHTML = '<h1>Dziękujemy za przesłanie obrazu!</h1>';
+                    document.body.style.pointerEvents = 'none';
+                    window.close()
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+
+        document.getElementById('eraserBtn').addEventListener('click', () => {
+            eraser = !eraser;
+            document.getElementById('eraserBtn').textContent = eraser ? 'Pędzel' : 'Gumka';
+        });
+
+        document.getElementById('sizeSlider').addEventListener('input', (e) => {
+            document.getElementById('sizeValue').textContent = e.target.value;
+        });
+        document.getElementById('changeBackgroundBtn').addEventListener('click', () => {
+            backgroundColor = document.getElementById('backgroundColorPicker').value;
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+
+    </script>
 </body>
 
 </html>

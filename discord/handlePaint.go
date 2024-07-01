@@ -1,30 +1,44 @@
 package discord
 
 import (
+	"bytes"
 	"log"
+	"os"
+	"time"
 	"webscraping/paint"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/google/uuid"
 )
 
-const ADR = "http://localhost:8080/"
-
 func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.PaintSessions) {
-	sessionId := "test"
+	sessionId := uuid.NewString()
 
+	url := os.Getenv("BASE_URL")
 	session := paint.PaintSession{
-		Id:       sessionId,
-		FinishCh: make(chan bool),
+		Id:         sessionId,
+		ImgBytesCh: make(chan []byte),
+		ExpiresAt:  time.Now().Add(4 * time.Hour),
 	}
 
 	ps.AddSession(sessionId, session)
-	s.ChannelMessageSend(m.ChannelID, ADR+sessionId)
+	s.ChannelMessageSend(m.ChannelID, url+"/?session_id="+sessionId)
 
-	isFinish := <-session.FinishCh
-
-	if isFinish {
-		log.Println("finish")
+	imgBytes := <-session.ImgBytesCh
+	imgName := m.Author.Username + "_" + sessionId + ".png"
+	file := &discordgo.File{
+		Name:        imgName,
+		ContentType: "image/png",
+		Reader:      bytes.NewReader(imgBytes),
 	}
-	s.ChannelMessageSend(m.ChannelID, "finish")
+
+	msg := discordgo.MessageSend{
+		File:    file,
+		Content: "Oto piękny obraz: " + m.Author.Mention(),
+	}
+	log.Printf("> Painting %s has been sent", imgName)
+	s.ChannelMessageSendComplex(m.ChannelID, &msg)
+
+	ps.RemoveSession(sessionId)
 
 }

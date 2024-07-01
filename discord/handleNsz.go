@@ -60,7 +60,6 @@ func handleNsz(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.
 			Image:       img,
 		}
 		s.ChannelMessageSendEmbed(m.ChannelID, emb)
-
 	}
 
 }

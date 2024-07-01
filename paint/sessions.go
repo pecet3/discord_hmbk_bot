@@ -3,11 +3,13 @@ package paint
 import (
 	"errors"
 	"sync"
+	"time"
 )
 
 type PaintSession struct {
-	Id       string
-	FinishCh chan bool
+	Id         string
+	ImgBytesCh chan []byte
+	ExpiresAt  time.Time
 }
 
 type PaintSessions struct {

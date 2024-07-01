@@ -42,5 +42,4 @@ func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
 		display = m.Mentions[0].Mention() + " ma " + resultStr + " IQ.\n" + summary
 	}
 	s.ChannelMessageSend(m.ChannelID, display)
-
 }
