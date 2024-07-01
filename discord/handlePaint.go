@@ -34,7 +34,7 @@ func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.Pai
 
 	msg := discordgo.MessageSend{
 		File:    file,
-		Content: "Oto piękny obraz: " + m.Author.Mention(),
+		Content: "Oto piękny obraz " + m.Author.Mention(),
 	}
 	log.Printf("> Painting %s has been sent", imgName)
 	s.ChannelMessageSendComplex(m.ChannelID, &msg)
