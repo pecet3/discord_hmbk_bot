@@ -2,7 +2,6 @@ package discord
 
 import (
 	"fmt"
-	"log"
 	"time"
 	"webscraping/scraper"
 
@@ -34,7 +33,6 @@ func handleDay(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.
 		entities = day.Scraper.GetEntities(day)
 		day.ExpiresAt = time.Now().Add(6 * time.Hour)
 	}
-	log.Println("[👍] Day cache hit")
 	scrap.SavePage(day)
 
 	display := ""

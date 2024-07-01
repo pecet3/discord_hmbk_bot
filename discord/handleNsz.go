@@ -1,7 +1,6 @@
 package discord
 
 import (
-	"log"
 	"strconv"
 	"time"
 	"webscraping/scraper"
@@ -16,7 +15,6 @@ func handleNsz(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.
 		entities = nsz.Scraper.GetEntities(nsz)
 		nsz.ExpiresAt = time.Now().Add(6 * time.Hour)
 	}
-	log.Println("[👍] Nsz cache hit")
 
 	scrap.SavePage(nsz)
 

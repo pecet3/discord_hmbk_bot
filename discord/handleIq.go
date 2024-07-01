@@ -1,7 +1,6 @@
 package discord
 
 import (
-	"log"
 	"math/rand"
 	"strconv"
 
@@ -42,7 +41,6 @@ func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		display = m.Mentions[0].Mention() + " ma " + resultStr + " IQ.\n" + summary
 	}
-	log.Println(">", display)
 	s.ChannelMessageSend(m.ChannelID, display)
 
 }

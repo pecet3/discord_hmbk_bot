@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 	"webscraping/discord"
+	"webscraping/paint"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -27,7 +28,11 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-	discord.Run(dc)
+
+	ps := paint.NewPaintSessions()
+
+	discord.Run(dc, ps)
+	paint.Run(ps)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
