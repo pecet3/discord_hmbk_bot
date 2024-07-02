@@ -22,23 +22,25 @@ func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.Pai
 	}
 
 	ps.AddSession(sessionId, session)
+
 	s.ChannelMessageSend(m.ChannelID, url+"/?session_id="+sessionId)
 
-	imgBytes := <-session.ImgBytesCh
-	imgName := m.Author.Username + "_" + sessionId + ".png"
-	file := &discordgo.File{
-		Name:        imgName,
-		ContentType: "image/png",
-		Reader:      bytes.NewReader(imgBytes),
+	for {
+		imgBytes := <-session.ImgBytesCh
+		imgName := m.Author.Username + "_" + sessionId + ".png"
+		file := &discordgo.File{
+			Name:        imgName,
+			ContentType: "image/png",
+			Reader:      bytes.NewReader(imgBytes),
+		}
+
+		msg := discordgo.MessageSend{
+			File:    file,
+			Content: "Oto piękny obraz autorstwa" + m.Author.Mention(),
+		}
+		log.Printf("> Painting %s has been sent", imgName)
+		s.ChannelMessageSendComplex(m.ChannelID, &msg)
+		ps.RemoveSession(sessionId)
+		break
 	}
-
-	msg := discordgo.MessageSend{
-		File:    file,
-		Content: "Oto piękny obraz " + m.Author.Mention(),
-	}
-	log.Printf("> Painting %s has been sent", imgName)
-	s.ChannelMessageSendComplex(m.ChannelID, &msg)
-
-	ps.RemoveSession(sessionId)
-
 }
