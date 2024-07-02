@@ -66,7 +66,7 @@
 
 </head>
 
-<body>
+<body id="body">
     <h1>HMBK paint</h1>
     <div>
         <canvas id="canvas" width="800" height="600" class="">
@@ -129,7 +129,9 @@
         canvas.addEventListener('mousemove', draw);
 
         document.getElementById('clearBtn').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            backgroundColor = document.getElementById('backgroundColorPicker').value;
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         });
 
         document.getElementById('sendBtn').addEventListener('click', () => {
@@ -137,23 +139,23 @@
             const sessionId = url.searchParams.get('session_id');
 
             const dataURL = canvas.toDataURL('image/png');
-            fetch('/painting', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ image: dataURL, session_id: sessionId })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    document.body.innerHTML = '<h1>Dziękujemy za przesłanie obrazu!</h1>';
-                    document.body.style.pointerEvents = 'none';
-                    window.close()
+            (async function () {
+                const response = await fetch('/painting', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: dataURL, session_id: sessionId })
                 })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+
+                if (response.status !== 200) {
+                    alert("Wystąpił błąd, spróbuj ponownie wpisać !paint")
+                    return
+                }
+                const body = document.querySelector("body")
+                body.innerHTML = "<h1>Obraz został przesłany</h1>"
+            })()
+
         });
 
         document.getElementById('eraserBtn').addEventListener('click', () => {

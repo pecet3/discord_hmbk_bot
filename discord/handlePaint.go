@@ -23,7 +23,13 @@ func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.Pai
 
 	ps.AddSession(sessionId, session)
 
-	s.ChannelMessageSend(m.ChannelID, url+"/?session_id="+sessionId)
+	prvChannel, err := s.UserChannelCreate(m.Author.ID)
+	if err != nil {
+		return
+	}
+	prvMsg := "Obyś nie skończył jak słynny akwarelista ( ͡° ͜ʖ ͡°)\n" +
+		url + "?session_id=" + sessionId
+	s.ChannelMessageSend(prvChannel.ID, prvMsg)
 
 	for {
 		imgBytes := <-session.ImgBytesCh

@@ -54,4 +54,5 @@ func handlePainting(w http.ResponseWriter, r *http.Request, ps *PaintSessions) {
 
 	s.ImgBytesCh <- imgBytes
 
+	w.WriteHeader(http.StatusOK)
 }
