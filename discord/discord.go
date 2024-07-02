@@ -37,6 +37,9 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if m.Author.ID == s.State.User.ID {
 			return
 		}
+		if len(m.Content) <= 0 {
+			return
+		}
 		pfix := string(m.Content[:1])
 		if pfix != PREFIX {
 			return
