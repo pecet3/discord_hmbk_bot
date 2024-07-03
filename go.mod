@@ -1,4 +1,4 @@
-module webscraping
+module github.com/pecet3/discord_hmbk_bot
 
 go 1.22.1
 

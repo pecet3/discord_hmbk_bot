@@ -5,7 +5,8 @@ import (
 	"log"
 	"os"
 	"time"
-	"webscraping/paint"
+
+	"github.com/pecet3/discord_hmbk_bot/paint"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"

@@ -6,8 +6,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"webscraping/discord"
-	"webscraping/paint"
+
+	"github.com/pecet3/discord_hmbk_bot/discord"
+	"github.com/pecet3/discord_hmbk_bot/paint"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"

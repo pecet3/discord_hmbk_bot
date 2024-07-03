@@ -3,7 +3,8 @@ package discord
 import (
 	"strconv"
 	"time"
-	"webscraping/scraper"
+
+	"github.com/pecet3/discord_hmbk_bot/scraper"
 
 	"github.com/bwmarrin/discordgo"
 )
