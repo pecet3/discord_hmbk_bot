@@ -66,7 +66,6 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		}
 
 	})
-
 	if err := discord.Open(); err != nil {
 		log.Fatal(err)
 		return

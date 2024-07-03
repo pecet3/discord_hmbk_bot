@@ -35,7 +35,7 @@ func main() {
 	ps := paint.NewPaintSessions()
 
 	discord.Run(dc, ps)
-	paint.Run(mux, ps)
+	paint.RunHTTP(mux, ps)
 
 	http.ListenAndServe(":8080", mux)
 

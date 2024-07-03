@@ -8,17 +8,6 @@ import (
 	"time"
 )
 
-func Run(mux *http.ServeMux, ps *PaintSessions) {
-
-	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
-
-	mux.HandleFunc("POST /painting", func(w http.ResponseWriter, r *http.Request) {
-		handlePainting(w, r, ps)
-	})
-
-	http.ListenAndServe(":8080", mux)
-}
-
 type PaintData struct {
 	Image     string `json:"image"`
 	SessionId string `json:"session_id"`
@@ -55,4 +44,15 @@ func handlePainting(w http.ResponseWriter, r *http.Request, ps *PaintSessions) {
 	s.ImgBytesCh <- imgBytes
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func RunHTTP(mux *http.ServeMux, ps *PaintSessions) {
+
+	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
+
+	mux.HandleFunc("POST /painting", func(w http.ResponseWriter, r *http.Request) {
+		handlePainting(w, r, ps)
+	})
+
+	http.ListenAndServe(":8080", mux)
 }
