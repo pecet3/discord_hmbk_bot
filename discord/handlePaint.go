@@ -29,7 +29,7 @@ func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.Pai
 		return
 	}
 	prvMsg := "Obyś nie skończył jak słynny akwarelista ( ͡° ͜ʖ ͡°)\n" +
-		url + "?session_id=" + sessionId
+		url + "paint/?session_id=" + sessionId
 	s.ChannelMessageSend(prvChannel.ID, prvMsg)
 
 	expiryCh := make(chan bool)

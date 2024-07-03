@@ -48,7 +48,7 @@ func handlePainting(w http.ResponseWriter, r *http.Request, ps *PaintSessions) {
 
 func RunHTTP(mux *http.ServeMux, ps *PaintSessions) {
 
-	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
+	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	mux.HandleFunc("POST /painting", func(w http.ResponseWriter, r *http.Request) {
 		handlePainting(w, r, ps)
