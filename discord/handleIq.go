@@ -33,7 +33,7 @@ func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
 		summary = "To bardzo mądry człowiek."
 	} else if result > 100 {
 		summary = "To człowiek niemądry niegłupi."
-	} else if result > 80 {
+	} else if result < 80 {
 		summary = "To debil."
 	}
 	var display string
