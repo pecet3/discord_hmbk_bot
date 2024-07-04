@@ -34,6 +34,7 @@ func handlePaint(s *discordgo.Session, m *discordgo.MessageCreate, ps *paint.Pai
 
 	expiryCh := make(chan bool)
 	go func(expiryCh chan bool) {
+		defer close(expiryCh)
 		for {
 			s, isExists := ps.GetSession(sessionId)
 			if !isExists {
