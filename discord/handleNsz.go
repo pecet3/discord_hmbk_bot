@@ -21,7 +21,7 @@ func handleNsz(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.
 
 	if len(NSZ)+2 > len(m.Content) {
 		display := ""
-		for i, a := range entities[:24] {
+		for i, a := range entities[:14] {
 			display = display + " _**[" + strconv.Itoa(i+1) + "]**_  " + a.Title + "\n"
 			i++
 		}
