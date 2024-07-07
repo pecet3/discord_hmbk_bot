@@ -12,12 +12,18 @@ import (
 func handleNsz(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.Scraper) {
 	nsz, _ := scrap.GetPage("szczytno")
 	entities := nsz.Entities
-	if nsz.ExpiresAt.Before(time.Now()) {
+	if entities == nil {
 		entities = nsz.Scraper.GetEntities(nsz)
 		nsz.ExpiresAt = time.Now().Add(6 * time.Hour)
+		scrap.SavePage(nsz)
+	} else {
+		if !nsz.ExpiresAt.Before(time.Now()) {
+		} else {
+			entities = nsz.Scraper.GetEntities(nsz)
+			nsz.ExpiresAt = time.Now().Add(6 * time.Hour)
+			scrap.SavePage(nsz)
+		}
 	}
-
-	scrap.SavePage(nsz)
 
 	if len(NSZ)+2 > len(m.Content) {
 		display := ""

@@ -3,6 +3,7 @@ package discord
 import (
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/pecet3/discord_hmbk_bot/paint"
@@ -19,9 +20,48 @@ const (
 	PAINT  = "paint"
 )
 
+type BotUserSessions struct {
+	Sessions map[string]*Session
+	Mutex    sync.Mutex
+}
+
+type Session struct {
+	UserId    string
+	ExpiresAt time.Time
+}
+
+func NewSessions() *BotUserSessions {
+	return &BotUserSessions{
+		Sessions: make(map[string]*Session),
+	}
+}
+
+func (bus *BotUserSessions) AddSession(userId string) {
+	bus.Mutex.Lock()
+	defer bus.Mutex.Unlock()
+	bus.Sessions[userId] = &Session{
+		UserId:    userId,
+		ExpiresAt: time.Now().Add(10 * time.Second),
+	}
+}
+
+func (bus *BotUserSessions) GetSession(id string) (*Session, bool) {
+	bus.Mutex.Lock()
+	defer bus.Mutex.Unlock()
+	session, exists := bus.Sessions[id]
+	return session, exists
+}
+
+func (bus *BotUserSessions) RemoveSession(id string) {
+	bus.Mutex.Lock()
+	defer bus.Mutex.Unlock()
+	delete(bus.Sessions, id)
+}
+
 func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	defer discord.Close()
 	scrap := scraper.New()
+	sessions := NewSessions()
 
 	scrap.PagesMap["szczytno"] = &scraper.Page{
 		Name:      "szczytno",
@@ -38,6 +78,21 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if m.Author.ID == s.State.User.ID {
 			return
 		}
+		us, exists := sessions.GetSession(m.Author.ID)
+		if exists {
+			if !us.ExpiresAt.Before(time.Now()) {
+				log.Printf("<SPAM PROTECTION> [!] \nBlocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
+				return
+			}
+			log.Printf("<SPAM PROTECTION> New Session,  user: %s with ID: %s", m.Author.Username, m.Author.ID)
+
+			sessions.RemoveSession(m.Author.ID)
+			sessions.AddSession(m.Author.ID)
+		} else {
+			sessions.AddSession(m.Author.ID)
+			log.Println("<SPAM PROTECTION> Added a session:", m.Author.ID)
+		}
+
 		if len(m.Content) <= 0 {
 			return
 		}
