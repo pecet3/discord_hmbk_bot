@@ -78,6 +78,15 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if m.Author.ID == s.State.User.ID {
 			return
 		}
+
+		if len(m.Content) <= 0 {
+			return
+		}
+		pfix := string(m.Content[:1])
+		if pfix != PREFIX {
+			return
+		}
+		// spam protection
 		us, exists := sessions.GetSession(m.Author.ID)
 		if exists {
 			if !us.ExpiresAt.Before(time.Now()) {
@@ -93,13 +102,6 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			log.Println("<SPAM PROTECTION> Added a session:", m.Author.ID)
 		}
 
-		if len(m.Content) <= 0 {
-			return
-		}
-		pfix := string(m.Content[:1])
-		if pfix != PREFIX {
-			return
-		}
 		if strings.Contains(m.Content[1:], NSZ) {
 			logActivity(m, NSZ)
 			handleNsz(s, m, scrap)

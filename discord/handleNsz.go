@@ -21,6 +21,8 @@ func handleNsz(s *discordgo.Session, m *discordgo.MessageCreate, scrap *scraper.
 			entities = nsz.Scraper.GetEntities(nsz)
 			nsz.ExpiresAt = time.Now().Add(6 * time.Hour)
 			scrap.SavePage(nsz)
+		} else {
+			entities = nsz.Scraper.GetEntities(nsz)
 		}
 	}
 
