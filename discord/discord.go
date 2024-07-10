@@ -91,7 +91,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if exists {
 			if !us.ExpiresAt.Before(time.Now()) {
 				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
-				// return
+				return
 			}
 			log.Printf("<SPAM PROTECTION> New Session,  user: %s with ID: %s", m.Author.Username, m.Author.ID)
 
