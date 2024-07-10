@@ -73,7 +73,7 @@ func (ns NszScraper) GetEntities(cn *Page) []Entity {
 			break
 		}
 	}
-
+	cn.Entities = nil
 	for i, art := range Entities {
 		if i < len(links) {
 			art.Link = links[i]
