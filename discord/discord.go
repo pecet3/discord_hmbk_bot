@@ -18,6 +18,7 @@ const (
 	DAY    = "dzien"
 	IQ     = "iq"
 	PAINT  = "paint"
+	HUJ    = "huj"
 )
 
 type BotUserSessions struct {
@@ -115,6 +116,11 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if strings.Contains(m.Content, IQ) {
 			logActivity(m, IQ)
 			handleIq(s, m)
+		}
+
+		if strings.Contains(m.Content, HUJ) {
+			logActivity(m, HUJ)
+			handleHuj(s, m)
 		}
 
 		if strings.Contains(m.Content, PAINT) {

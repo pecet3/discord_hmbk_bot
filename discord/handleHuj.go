@@ -7,13 +7,13 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func weightedRandom() int {
+func hujRandom() int {
 
 	numbers := make([]int, 0)
 
-	for i := 1; i <= 200; i++ {
-		if i >= 80 && i <= 120 {
-			for j := 0; j < 5; j++ {
+	for i := 1; i <= 30; i++ {
+		if i >= 10 && i <= 18 {
+			for j := 0; j < 3; j++ {
 				numbers = append(numbers, i)
 			}
 		} else {
@@ -24,30 +24,23 @@ func weightedRandom() int {
 	return numbers[rand.Intn(len(numbers))]
 }
 
-var pecetId = strconv.Itoa(282817551401091072)
-var kszaqId = strconv.Itoa(377032854179282944)
-var szuwax = strconv.Itoa(271400105658155018)
-
-func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
-	result := weightedRandom()
+func handleHuj(s *discordgo.Session, m *discordgo.MessageCreate) {
+	result := hujRandom()
 
 	resultStr := strconv.Itoa(result)
-	summary := "To jebany debil."
+	summary := "mikrus"
 
-	if result > 140 {
-		summary = "To człowiek mądry, szlachetny i bardzo inteligentny."
-	} else if result > 120 {
-		summary = "To bardzo mądry człowiek."
-	} else if result > 100 {
-		summary = "To człowiek niemądry niegłupi."
+	if result > 25 {
+		summary = "Potężna pała"
+	} else if result > 16 {
+		summary = "Kolega zadowolony"
+	} else if result > 10 {
+		summary = "Może być..."
 	}
-	if m.Author.ID == szuwax {
-		summary = "To jebany imbecyl"
-		resultStr = "-1"
-	}
+
 	var display string
 	if len(m.Mentions) <= 0 {
-		display = m.Author.Mention() + " ma " + resultStr + " IQ.\n" + summary
+		display = m.Author.Mention() + " ma " + resultStr + " cm huj.\n" + summary
 
 		if m.Author.ID == pecetId || m.Author.ID == kszaqId {
 			summary = "To jebany geniusz który osiągnął stan nirvany i oświecenia"
@@ -59,10 +52,6 @@ func handleIq(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if userId == pecetId || userId == kszaqId {
 			summary = "To jebany geniusz który osiągnął stan nirvany i oświecenia"
 			resultStr = "999"
-		}
-		if userId == szuwax {
-			summary = "To jebany imbecyl"
-			resultStr = "-1"
 		}
 		display = m.Mentions[0].Mention() + " ma " + resultStr + " IQ.\n" + summary
 	}
