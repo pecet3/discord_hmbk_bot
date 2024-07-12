@@ -40,20 +40,9 @@ func handleHuj(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	var display string
 	if len(m.Mentions) <= 0 {
-		display = m.Author.Mention() + " ma " + resultStr + " cm huj.\n" + summary
-
-		if m.Author.ID == pecetId || m.Author.ID == kszaqId {
-			summary = "To jebany geniusz który osiągnął stan nirvany i oświecenia"
-			resultStr = "999"
-		}
-
+		display = m.Author.Mention() + " ma " + resultStr + " cm huja.\n" + summary
 	} else {
-		userId := m.Mentions[0].Mention()[2 : len(m.Mentions[0].Mention())-1]
-		if userId == pecetId || userId == kszaqId {
-			summary = "To jebany geniusz który osiągnął stan nirvany i oświecenia"
-			resultStr = "999"
-		}
-		display = m.Mentions[0].Mention() + " ma " + resultStr + " IQ.\n" + summary
+		display = m.Mentions[0].Mention() + " ma " + resultStr + " cm huja.\n" + summary
 	}
 	s.ChannelMessageSend(m.ChannelID, display)
 }
