@@ -89,18 +89,17 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		}
 		// spam protection
 		us, exists := sessions.GetSession(m.Author.ID)
-		// ch := m.ChannelID
-		// err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
-		// if err != nil {
-		// 	log.Println(err, "HANDLER ERROR")
-		// }
+
 		if exists {
 			if !us.ExpiresAt.Before(time.Now()) {
 				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
+				ch := m.ChannelID
+				err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
+				if err != nil {
+					log.Println(err, "HANDLER ERROR")
+				}
 				return
 			}
-			log.Printf("<SPAM PROTECTION> New Session %s ID: %s", m.Author.Username, m.Author.ID)
-
 			sessions.RemoveSession(m.Author.ID)
 			sessions.AddSession(m.Author.ID)
 
@@ -112,6 +111,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if strings.Contains(m.Content[1:], NSZ) {
 			logActivity(m, NSZ)
 			handleNsz(s, m, scrap)
+
 		}
 
 		if strings.Contains(m.Content, DAY) {
