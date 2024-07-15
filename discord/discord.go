@@ -132,6 +132,11 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if strings.Contains(m.Content, PAINT) {
 			logActivity(m, PAINT)
 			handlePaint(s, m, ps)
+			ch := m.ChannelID
+			err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
+			if err != nil {
+				log.Println(err, "HANDLER ERROR")
+			}
 		}
 
 	})
