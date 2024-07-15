@@ -18,6 +18,11 @@ func splitByUpperCase(s string) []string {
 	return parts
 }
 
+type ReceiverEnt struct {
+	Titles   []string
+	Contents []string
+}
+
 func (ns DayScraper) GetEntities(cn *Page) []Entity {
 
 	c := colly.NewCollector()
@@ -25,22 +30,21 @@ func (ns DayScraper) GetEntities(cn *Page) []Entity {
 	baseUrl := "https://www.kalbi.pl/kalendarz-swiat-nietypowych"
 	route := baseUrl
 
-	var entities []Entity
-	ch := make(chan int)
+	receiverCh := make(chan ReceiverEnt)
 	go func() {
+		defer close(receiverCh)
 		c.OnHTML("div.descritoptions-of-holiday", func(e *colly.HTMLElement) {
 			titlesStr := e.ChildText("a")
 			contentStr := e.ChildText("p")
 			titles := splitByUpperCase(titlesStr)
 			contents := strings.Split(contentStr, "\n")
-			for i, title := range titles {
-				var ent Entity
-				ent.Title = title
-				ent.Content = contents[i]
-				entities = append(entities, ent)
-				if i == len(titles)-1 {
-					ch <- len(titles)
+
+			for len(titles) > 0 {
+				en := ReceiverEnt{
+					Titles:   titles,
+					Contents: contents,
 				}
+				receiverCh <- en
 			}
 		})
 		c.OnRequest(func(r *colly.Request) {
@@ -49,7 +53,21 @@ func (ns DayScraper) GetEntities(cn *Page) []Entity {
 
 		c.Visit(route)
 	}()
-	i := <-ch
-	cn.Entities = entities[:i]
+
+	recv := <-receiverCh
+
+	var entities []Entity
+	if len(recv.Contents) != len(recv.Titles) {
+		return []Entity{}
+	}
+	for i, t := range recv.Titles {
+		ent := Entity{
+			Title:   t,
+			Content: recv.Contents[i],
+		}
+		entities = append(entities, ent)
+	}
+
+	cn.Entities = entities
 	return cn.Entities
 }
