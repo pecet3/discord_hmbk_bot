@@ -29,7 +29,9 @@ COPY --from=builder /app/static ./static
 COPY --from=builder /app/.env .
 
 # Load environment variables
-RUN export $(cat .env | xargs)
+ENV BASE_URL=https://hmbk.bieda.it/
+ARG DISCORD_TOKEN
+ENV DISCORD_TOKEN=$DISCORD_TOKEN
 
 # Expose the port the app runs on
 EXPOSE 8080
