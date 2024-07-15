@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.22'
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag pecet31/discordbot:latest
+
+    - name: Deploy on the VPS
+        env:
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+        VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      run: |
+        echo "$VPS_SSH_KEY" > vps_ssh_key 
+        chmod 600 vps_ssh_key
+        docker save pecet31/discordbot:latest | ssh -i vps_ssh_key -p 10111 -o StrictHostKeyChecking=no $VPS_USERNAME@$VPS_HOST "docker load && docker stop pecet31-container || true && docker rm pecet31-container || true && docker run --name pecet31-container -d -p 8070:8070 pecet31/discordbot:latest"
+        rm vps_ssh_key
