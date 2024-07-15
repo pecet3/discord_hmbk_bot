@@ -89,11 +89,11 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		}
 		// spam protection
 		us, exists := sessions.GetSession(m.Author.ID)
-		ch := m.ChannelID
-		err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
-		if err != nil {
-			log.Println(err, "HANDLER ERROR")
-		}
+		// ch := m.ChannelID
+		// err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
+		// if err != nil {
+		// 	log.Println(err, "HANDLER ERROR")
+		// }
 		if exists {
 			if !us.ExpiresAt.Before(time.Now()) {
 				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
