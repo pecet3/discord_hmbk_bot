@@ -99,7 +99,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
 				return
 			}
-			log.Printf("<SPAM PROTECTION> New Session %s_ID: %s", m.Author.Username, m.Author.ID)
+			log.Printf("<SPAM PROTECTION> New Session %s ID: %s", m.Author.Username, m.Author.ID)
 
 			sessions.RemoveSession(m.Author.ID)
 			sessions.AddSession(m.Author.ID)
