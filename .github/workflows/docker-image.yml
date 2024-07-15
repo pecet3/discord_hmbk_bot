@@ -19,7 +19,13 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.22'
-    
+    - name: Build .env file
+      env:
+        DISCORD_TOKEN: ${{secrets.VPS_HOST}}
+        run: |
+          echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          
     - name: Build the Docker image
       env:
         DISCORD_TOKEN: ${{secrets.VPS_HOST}}
