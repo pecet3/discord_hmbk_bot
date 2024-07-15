@@ -26,11 +26,10 @@ COPY --from=builder /app/main .
 
 # Copy static files and .env
 COPY --from=builder /app/static ./static
+COPY --from=builder /app/.env .
 
 # Load environment variables
-ENV BASE_URL=https://hmbk.bieda.it/
-ARG DISCORD_TOKEN
-ENV DISCORD_TOKEN=$DISCORD_TOKEN
+COPY .env* ./ 
 
 # Expose the port the app runs on
 EXPOSE 8080
