@@ -26,7 +26,6 @@ COPY --from=builder /app/main .
 
 # Copy static files and .env
 COPY --from=builder /app/static ./static
-COPY --from=builder /app/.env .
 
 # Load environment variables
 ENV BASE_URL=https://hmbk.bieda.it/
