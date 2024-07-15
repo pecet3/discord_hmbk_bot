@@ -19,11 +19,15 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.22'
-    
-    - name: Build the Docker image
+    - name: Build .env file
       env:
         DISCORD_TOKEN: ${{secrets.VPS_HOST}}
-      run: docker build . --file Dockerfile --build-arg DISCORD_TOKEN=$DISCORD_TOKEN --tag pecet31/discordbot:latest
+      run: |
+        echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> .env
+        echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag pecet31/discordbot:latest
 
     - name: Deploy on the VPS
       env:
