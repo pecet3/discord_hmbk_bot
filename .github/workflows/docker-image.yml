@@ -21,7 +21,9 @@ jobs:
         go-version: '1.22'
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag pecet31/discordbot:latest
+      env:
+        DISCORD_TOKEN: ${{secrets.VPS_HOST}}
+      run: docker build . --file Dockerfile --build-arg DISCORD_TOKEN=$DISCORD_TOKEN --tag pecet31/discordbot:latest
 
     - name: Deploy on the VPS
       env:
