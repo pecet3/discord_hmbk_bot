@@ -25,6 +25,7 @@ jobs:
       run: |
         echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> .env
         echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+        echo "GPT_KEY=${{secrets.GPT_KEY}}" >> .env
           
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag pecet31/discordbot:latest
