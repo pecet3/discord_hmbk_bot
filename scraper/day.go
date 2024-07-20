@@ -54,6 +54,7 @@ func (ns DayScraper) GetEntities(cn *Page) []Entity {
 	if len(entities) <= 0 {
 		return []Entity{}
 	}
+	cn.Entities = []Entity{}
 	cn.Entities = entities[:i]
 	return cn.Entities
 }
