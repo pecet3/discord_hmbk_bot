@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"math/rand"
 	"net/http"
@@ -30,7 +31,7 @@ func handlePraise(praiseCh chan *discordgo.User, discord *discordgo.Session) {
 			}
 		default:
 			now := time.Now()
-			if now.Second() == 0 && now.Minute() == 0 && now.Hour() == 15 || now.Second() == 0 && now.Minute() == 0 && now.Hour() == 18 || now.Second() == 0 && now.Minute() == 0 && now.Hour() == 23 {
+			if now.Second() == 0 && now.Minute() == 0 && now.Hour() == 9 || now.Hour() == 13 || now.Hour() == 20 {
 				if len(users) <= 0 {
 					continue
 				}
@@ -41,7 +42,6 @@ func handlePraise(praiseCh chan *discordgo.User, discord *discordgo.Session) {
 				if winner == nil {
 					continue
 				}
-
 				praise, err := generatePraise(winner.Username)
 				if err != nil {
 					log.Println(err)
@@ -51,10 +51,8 @@ func handlePraise(praiseCh chan *discordgo.User, discord *discordgo.Session) {
 				discord.ChannelMessageSend(FONTANNA_ID, winner.Mention()+praise[lenName:])
 				users = nil
 			}
-
 		}
 		time.Sleep(70 * time.Millisecond)
-
 	}
 }
 
@@ -63,7 +61,9 @@ func generatePraise(name string) (string, error) {
 
 	ctx := context.Background()
 	apiKey := os.Getenv("GPT_KEY")
-
+	if apiKey == "" {
+		return "", errors.New("no api key")
+	}
 	system := "Jesteś botem, który chwali ludzi w sposób zabawny. Twoje odpowiedzi mają maksymalnie 3 zdania. Pochwałe zaczynasz zawsze od nicku."
 	human := "Pochwal użytkownika o nicku: " + name
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)

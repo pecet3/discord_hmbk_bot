@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/pecet3/discord_hmbk_bot/discord"
+	"github.com/pecet3/discord_hmbk_bot/message"
 	"github.com/pecet3/discord_hmbk_bot/paint"
 
 	"github.com/bwmarrin/discordgo"
@@ -31,12 +32,13 @@ func main() {
 		return
 	}
 	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	ps := paint.NewPaintSessions()
 
 	discord.Run(dc, ps)
-	paint.RunHTTP(mux, ps)
-
+	paint.Run(mux, ps)
+	message.Run(mux, dc)
 	http.ListenAndServe(":8080", mux)
 
 	sc := make(chan os.Signal, 1)

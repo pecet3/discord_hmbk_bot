@@ -63,7 +63,7 @@ func (bus *BotUserSessions) RemoveSession(id string) {
 func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	defer discord.Close()
 	scrap := scraper.New()
-	// sessions := NewSessions()
+	sessions := NewSessions()
 
 	scrap.PagesMap["szczytno"] = &scraper.Page{
 		Name:      "szczytno",
@@ -94,25 +94,25 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			return
 		}
 		// spam protection
-		// us, exists := sessions.GetSession(m.Author.ID)
+		us, exists := sessions.GetSession(m.Author.ID)
 
-		// if exists {
-		// 	if !us.ExpiresAt.Before(time.Now()) {
-		// 		log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
-		// 		ch := m.ChannelID
-		// 		err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
-		// 		if err != nil {
-		// 			log.Println(err, "HANDLER ERROR")
-		// 		}
-		// 		return
-		// 	}
-		// 	sessions.RemoveSession(m.Author.ID)
-		// 	sessions.AddSession(m.Author.ID)
+		if exists {
+			if !us.ExpiresAt.Before(time.Now()) {
+				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
+				ch := m.ChannelID
+				err := s.ChannelMessagesBulkDelete(ch, []string{m.Message.ID})
+				if err != nil {
+					log.Println(err, "HANDLER ERROR")
+				}
+				return
+			}
+			sessions.RemoveSession(m.Author.ID)
+			sessions.AddSession(m.Author.ID)
 
-		// } else {
-		// 	sessions.AddSession(m.Author.ID)
-		// 	log.Println("<SPAM PROTECTION> Added a session:", m.Author.ID)
-		// }
+		} else {
+			sessions.AddSession(m.Author.ID)
+			log.Println("<SPAM PROTECTION> Added a session:", m.Author.ID)
+		}
 
 		if strings.Contains(m.Content[1:], NSZ) {
 			logActivity(m, NSZ)

@@ -46,13 +46,10 @@ func handlePainting(w http.ResponseWriter, r *http.Request, ps *PaintSessions) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func RunHTTP(mux *http.ServeMux, ps *PaintSessions) {
-
-	mux.Handle("/", http.FileServer(http.Dir("./static")))
+func Run(mux *http.ServeMux, ps *PaintSessions) {
 
 	mux.HandleFunc("POST /painting", func(w http.ResponseWriter, r *http.Request) {
 		handlePainting(w, r, ps)
 	})
 
-	http.ListenAndServe(":8080", mux)
 }
