@@ -76,8 +76,8 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		Scraper:   scraper.DayScraper{},
 	}
 
-	praiseCh := make(chan *discordgo.User)
-	go handlePraise(praiseCh, discord)
+	// praiseCh := make(chan *discordgo.User)
+	// go handlePraise(praiseCh, discord)
 
 	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if m.Author.ID == s.State.User.ID {
@@ -87,7 +87,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if len(m.Content) <= 0 {
 			return
 		}
-		praiseCh <- m.Author
+		// praiseCh <- m.Author
 
 		pfix := string(m.Content[:1])
 		if pfix != PREFIX {
