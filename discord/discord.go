@@ -8,6 +8,7 @@ import (
 
 	"github.com/pecet3/discord_hmbk_bot/paint"
 	"github.com/pecet3/discord_hmbk_bot/scraper"
+	"github.com/pecet3/discord_hmbk_bot/sessions"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -32,38 +33,10 @@ type Session struct {
 	ExpiresAt time.Time
 }
 
-func NewSessions() *BotUserSessions {
-	return &BotUserSessions{
-		Sessions: make(map[string]*Session),
-	}
-}
-
-func (bus *BotUserSessions) AddSession(userId string) {
-	bus.Mutex.Lock()
-	defer bus.Mutex.Unlock()
-	bus.Sessions[userId] = &Session{
-		UserId:    userId,
-		ExpiresAt: time.Now().Add(10 * time.Second),
-	}
-}
-
-func (bus *BotUserSessions) GetSession(id string) (*Session, bool) {
-	bus.Mutex.Lock()
-	defer bus.Mutex.Unlock()
-	session, exists := bus.Sessions[id]
-	return session, exists
-}
-
-func (bus *BotUserSessions) RemoveSession(id string) {
-	bus.Mutex.Lock()
-	defer bus.Mutex.Unlock()
-	delete(bus.Sessions, id)
-}
-
 func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	defer discord.Close()
 	scrap := scraper.New()
-	sessions := NewSessions()
+	sessions := sessions.New()
 
 	scrap.PagesMap["szczytno"] = &scraper.Page{
 		Name:      "szczytno",
@@ -94,7 +67,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			return
 		}
 		// spam protection
-		us, exists := sessions.GetSession(m.Author.ID)
+		us, exists := sessions.GetSpamSession(m.Author.ID)
 
 		if exists {
 			if !us.ExpiresAt.Before(time.Now()) {
@@ -106,11 +79,11 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 				}
 				return
 			}
-			sessions.RemoveSession(m.Author.ID)
-			sessions.AddSession(m.Author.ID)
+			sessions.RemoveSpamSession(m.Author.ID)
+			sessions.AddSpamSession(m.Author.ID)
 
 		} else {
-			sessions.AddSession(m.Author.ID)
+			sessions.AddSpamSession(m.Author.ID)
 			log.Println("<SPAM PROTECTION> Added a session:", m.Author.ID)
 		}
 
