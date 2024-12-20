@@ -2,8 +2,8 @@ package discord
 
 import (
 	"log"
+	"math/rand"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/pecet3/discord_hmbk_bot/paint"
@@ -23,16 +23,6 @@ const (
 	FONTANNA_ID = "408025348199022593"
 )
 
-type BotUserSessions struct {
-	Sessions map[string]*Session
-	Mutex    sync.Mutex
-}
-
-type Session struct {
-	UserId    string
-	ExpiresAt time.Time
-}
-
 func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	defer discord.Close()
 	scrap := scraper.New()
@@ -49,6 +39,27 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		Scraper:   scraper.DayScraper{},
 	}
 
+	go func() {
+		for {
+			time.Sleep(time.Minute * 60)
+			i := 0
+			lenRandomS := len(sessions.RandomS)
+			if lenRandomS == 0 {
+				continue
+			}
+			winnerIndex := rand.Intn(lenRandomS)
+			log.Println("Winner index is: ", winnerIndex)
+			for uuid, u := range sessions.RandomS {
+				if i == winnerIndex {
+					discord.ChannelMessageSend(FONTANNA_ID, u.User.Username+" to totalny kozak")
+					break
+				}
+				sessions.RemoveRandomSession(uuid)
+				i++
+			}
+		}
+	}()
+
 	// praiseCh := make(chan *discordgo.User)
 	// go handlePraise(praiseCh, discord)
 
@@ -60,6 +71,13 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		if len(m.Content) <= 0 {
 			return
 		}
+
+		_, rSexists := sessions.GetRandomSession(m.Author.ID)
+		if !rSexists {
+			log.Println("Added to random session, user: ", m.Author)
+			sessions.AddRandomSession(m.Author)
+		}
+
 		// praiseCh <- m.Author
 
 		pfix := string(m.Content[:1])
@@ -67,9 +85,8 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			return
 		}
 		// spam protection
-		us, exists := sessions.GetSpamSession(m.Author.ID)
-
-		if exists {
+		us, sSexists := sessions.GetSpamSession(m.Author.ID)
+		if sSexists {
 			if !us.ExpiresAt.Before(time.Now()) {
 				log.Printf("<SPAM PROTECTION> [!] Blocked user: %s with ID: %s", m.Author.Username, m.Author.ID)
 				ch := m.ChannelID
