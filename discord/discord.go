@@ -41,7 +41,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 
 	go func() {
 		for {
-			time.Sleep(time.Minute * 60)
+			time.Sleep(time.Minute * 30000)
 			i := 0
 			lenRandomS := len(sessions.RandomS)
 			if lenRandomS == 0 {
