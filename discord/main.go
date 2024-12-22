@@ -42,7 +42,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	// Random Sessions handle loop
 	go func() {
 		for {
-			time.Sleep(time.Minute * 100000000)
+			time.Sleep(time.Minute * 1)
 			i := 0
 			lenRandomS := len(sessions.RandomS)
 			if lenRandomS == 0 {
@@ -50,14 +50,13 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			}
 			winnerIndex := rand.Intn(lenRandomS)
 			log.Println("Winner index is: ", winnerIndex)
-			for _, u := range sessions.RandomS {
+			for uuid, u := range sessions.RandomS {
 				if i == winnerIndex {
 					discord.ChannelMessageSend(FONTANNA_ID, u.User.Username+" to totalny kozak")
-					break
 				}
+				sessions.RemoveRandomSession(uuid)
 				i++
 			}
-
 		}
 	}()
 
