@@ -57,6 +57,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 				}
 				i++
 			}
+
 		}
 	}()
 
