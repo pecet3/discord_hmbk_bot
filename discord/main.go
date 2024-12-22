@@ -42,11 +42,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	// Random Sessions handle loop
 	go func() {
 		for {
-<<<<<<< HEAD:discord/main.go
 			time.Sleep(time.Minute * 1)
-=======
-			time.Sleep(time.Minute * 30000)
->>>>>>> 3b9b35e9375fda145adedb7234f618ec20f123f3:discord/discord.go
 			i := 0
 			lenRandomS := len(sessions.RandomS)
 			if lenRandomS == 0 {
