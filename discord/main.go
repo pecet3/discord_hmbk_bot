@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pecet3/discord_hmbk_bot/paint"
-	"github.com/pecet3/discord_hmbk_bot/scraper"
-	"github.com/pecet3/discord_hmbk_bot/sessions"
+	"github.com/pecet3/discord_hmbk_bot/pkg/paint"
+	"github.com/pecet3/discord_hmbk_bot/pkg/scraper"
+	"github.com/pecet3/discord_hmbk_bot/pkg/sessions"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -39,6 +39,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		Scraper:   scraper.DayScraper{},
 	}
 
+	// Random Sessions handle loop
 	go func() {
 		for {
 			time.Sleep(time.Minute * 60)
@@ -59,9 +60,6 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 			}
 		}
 	}()
-
-	// praiseCh := make(chan *discordgo.User)
-	// go handlePraise(praiseCh, discord)
 
 	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if m.Author.ID == s.State.User.ID {

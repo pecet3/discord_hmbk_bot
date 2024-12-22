@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/pecet3/discord_hmbk_bot/paint"
+	"github.com/pecet3/discord_hmbk_bot/pkg/paint"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"

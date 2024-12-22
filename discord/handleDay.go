@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pecet3/discord_hmbk_bot/scraper"
+	"github.com/pecet3/discord_hmbk_bot/pkg/scraper"
 
 	"github.com/bwmarrin/discordgo"
 )
