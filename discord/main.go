@@ -42,7 +42,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	// Random Sessions handle loop
 	go func() {
 		for {
-			time.Sleep(time.Minute * 180)
+			time.Sleep(time.Hour * 12)
 			i := 0
 			lenRandomS := len(sessions.RandomS)
 			if lenRandomS == 0 {
@@ -61,7 +61,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 	}()
 
 	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Author.ID == s.State.User.ID {
+		if m.Author.ID == s.State.User.ID || m.Author.Bot {
 			return
 		}
 
