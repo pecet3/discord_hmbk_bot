@@ -2,7 +2,6 @@ package discord
 
 import (
 	"log"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -39,26 +38,7 @@ func Run(discord *discordgo.Session, ps *paint.PaintSessions) {
 		Scraper:   scraper.DayScraper{},
 	}
 
-	// Random Sessions handle loop
-	go func() {
-		for {
-			time.Sleep(time.Hour * 12)
-			i := 0
-			lenRandomS := len(sessions.RandomS)
-			if lenRandomS == 0 {
-				continue
-			}
-			winnerIndex := rand.Intn(lenRandomS)
-			log.Println("Winner index is: ", winnerIndex)
-			for uuid, u := range sessions.RandomS {
-				if i == winnerIndex {
-					discord.ChannelMessageSend(FONTANNA_ID, u.User.Username+" to totalny kozak")
-				}
-				sessions.RemoveRandomSession(uuid)
-				i++
-			}
-		}
-	}()
+	go loopRandom(sessions, discord)
 
 	discord.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if m.Author.ID == s.State.User.ID || m.Author.Bot {

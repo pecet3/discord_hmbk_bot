@@ -7,12 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 	"github.com/pecet3/discord_hmbk_bot/discord"
 	"github.com/pecet3/discord_hmbk_bot/pkg/message"
 	"github.com/pecet3/discord_hmbk_bot/pkg/paint"
-
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 )
 
 func loadEnv() {
@@ -25,6 +24,7 @@ func loadEnv() {
 
 func main() {
 	loadEnv()
+
 	discordToken := os.Getenv("DISCORD_TOKEN")
 	dc, err := discordgo.New("Bot " + discordToken)
 	if err != nil {
