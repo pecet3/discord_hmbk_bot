@@ -9,7 +9,7 @@ import (
 	"github.com/pecet3/discord_hmbk_bot/pkg/sessions"
 )
 
-const intervalHour = 12
+const intervalHour = 24 * 30
 
 func getRandomText() string {
 	texts := [5]string{
