@@ -38,5 +38,5 @@ jobs:
       run: |
         echo "$VPS_SSH_KEY" > vps_ssh_key 
         chmod 600 vps_ssh_key
-        docker save pecet31/discordbot:latest | ssh -i vps_ssh_key -p 2137 -o StrictHostKeyChecking=no $VPS_USERNAME@$VPS_HOST "docker load && docker stop pecet31-discordbot || true && docker rm pecet31-discordbot || true && docker run --name pecet31-discordbot -d -p 90:8080 pecet31/discordbot:latest"
+        docker save pecet31/discordbot:latest | ssh -i vps_ssh_key -p 2137 -o StrictHostKeyChecking=no $VPS_USERNAME@$VPS_HOST "docker load && docker stop pecet31-discordbot || true && docker rm pecet31-discordbot || true && docker run -rm --name pecet31-discordbot -d -p 90:8080 pecet31/discordbot:latest"
         rm vps_ssh_key
